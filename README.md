@@ -1,6 +1,6 @@
 # Welcome to the console drawing programme!
 
-## Working only UNIX system (Windows just wait =>)
+## Working only in UNIX system (Windows just wait =>)
 
 ## To get started, issue the following commands:
 ```
