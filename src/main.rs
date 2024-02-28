@@ -15,20 +15,34 @@ impl Point {
   }
 }
 
-fn show_select_color(root: &mut Stdout, mx: u16, yp: u16) {
-  for i in 0..mx {
+fn show_select_color(root: &mut Stdout, yp: u16, mx: u16) {
+  let mut ptr: u16 = yp;
+  for _ in 0..yp {
     root.write(" ".as_bytes()).unwrap();
-    root.queue(cursor::MoveTo(mx, yp + i)).unwrap();
+    ptr -= 1;
+    root.queue(cursor::MoveTo(mx, ptr)).unwrap();
     root.flush().unwrap();
   }
 }
 
+fn show_info(root: &mut Stdout, mx: u16, my: u16) {
+  let data = "[R]ed [B]lue [Y]ellow [X]Black [W]hite [G]reen";
+  root.queue(cursor::MoveTo(mx, my)).unwrap();
+  root.write(data.as_bytes()).unwrap();
+  root.queue(cursor::MoveTo(0, 0)).unwrap();
+  root.flush().unwrap()
+}
+
 fn handle_event(mut point: Point) {
+  let mut draw_circle = false;
   let mut root: Stdout = stdout();
+  root.queue(terminal::Clear(terminal::ClearType::All)).unwrap();
+  root.queue(cursor::Hide).unwrap();
+  let win_size: (u16, u16) = terminal::size().expect("INFO: Cannot get size terminal");
+  let draw_area: (u16, u16) = (win_size.1-1, win_size.0-1);
+  show_info(&mut root, win_size.0, win_size.1);
   let mut color_select: Color = Color::White;
   root.queue(SetBackgroundColor(color_select)).unwrap();
-  let win_size: (u16, u16) = terminal::size().expect("INFO: Cannot get size terminal");
-  let draw_area: (u16, u16) = (win_size.1-4, win_size.0-2);
   for x in 0..draw_area.1 {
     for y in 0..draw_area.0 {
       root.write(" ".as_bytes()).unwrap();
@@ -36,8 +50,7 @@ fn handle_event(mut point: Point) {
       root.flush().unwrap();
     }
   }
-  root.queue(terminal::Clear(terminal::ClearType::All)).unwrap();
-  root.queue(cursor::Hide).unwrap();
+  root.write(" ".as_bytes()).unwrap();
   root.flush().unwrap();
   enable_raw_mode().unwrap();
   loop {
@@ -74,13 +87,18 @@ fn handle_event(mut point: Point) {
               KeyCode::Char('g') => { color_select = Color::Green; }
               KeyCode::Char('y') => { color_select = Color::Yellow; }
               KeyCode::Char('b') => { color_select = Color::Blue; }
+              KeyCode::Tab => { draw_circle = !draw_circle; }
               _ => {}
             }
             // root.queue(terminal::Clear(terminal::ClearType::All)).unwrap();
             root.queue(cursor::MoveTo(point.x, point.y)).unwrap();
             root.queue(SetBackgroundColor(color_select)).unwrap();
-            root.write(point.head.to_string().as_bytes()).unwrap();
-            show_select_color(&mut root, draw_area.1, draw_area.0);
+            if draw_circle {
+              root.write("•".to_string().as_bytes()).unwrap();
+            } else {
+              root.write(point.head.to_string().as_bytes()).unwrap();
+            }
+            show_select_color(&mut root, draw_area.0, draw_area.1);
             root.flush().unwrap();
           } _ => {
 
