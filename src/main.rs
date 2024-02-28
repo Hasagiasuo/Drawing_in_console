@@ -49,7 +49,7 @@ fn handle_event(mut point: Point) {
       root.queue(cursor::MoveTo(x, y)).unwrap();
       root.flush().unwrap();
     }
-  }
+  }  
   root.write(" ".as_bytes()).unwrap();
   root.flush().unwrap();
   enable_raw_mode().unwrap();
