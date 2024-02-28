@@ -1,5 +1,7 @@
 # Welcome to the console drawing programme!
 
+## Working only UNIX system (Windows just wait =>)
+
 ## To get started, issue the following commands:
 ```
 git clone https://github.com/Hasagiasuo/Drawing_in_console
